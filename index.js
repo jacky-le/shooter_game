@@ -53,8 +53,8 @@ class Projectile {
 
     draw() {
         c.save()
-        c.shadowBlur = 10
-        c.shadowColor = this.color
+        //c.shadowBlur = 10
+        //c.shadowColor = this.color
         c.beginPath()
         c.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
         c.fillStyle = this.color
@@ -207,7 +207,7 @@ function spawnEnemies() {
         const angle = Math.atan2(HEIGHT/2 - randY, WIDTH/2 - randX)
         const speed = {x: Math.cos(angle), y: Math.sin(angle)}
         enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:color, speed:speed}))
-    }, (2000 - score/10))
+    }, (900))
 }
 
 let animationID
