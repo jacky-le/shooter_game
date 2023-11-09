@@ -204,7 +204,7 @@ function spawnEnemies() {
             randX = Math.random() * WIDTH
             randY = Math.random() < 0.5 ? 0 - randR : HEIGHT + randR
         }
-        const angle = Math.atan2(HEIGHT/2 - randY, WIDTH/2 - randX)
+        const angle = Math.atan2(player.y - randY, player.x - randX)
         const speed = {x: Math.cos(angle), y: Math.sin(angle)}
         enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:color, speed:speed}))
     }, (900))
@@ -392,7 +392,7 @@ addEventListener("keydown", (event) => {
             randX = Math.random() * WIDTH
             randY = Math.random() < 0.5 ? 0 - randR : HEIGHT + randR
         }
-        const angle = Math.atan2(HEIGHT/2 - randY, WIDTH/2 - randX)
+        const angle = Math.atan2(player.y - randY, player.x - randX)
         const speed = {x: Math.cos(angle), y: Math.sin(angle)}
         enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:'rgb(50,50,50)', speed:speed}))
     }
