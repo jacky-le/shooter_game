@@ -316,6 +316,15 @@ function animate() {
                 }, 0)
             }
         })
+        // Enemy cleanup
+        if(enemy.x + enemy.radius < 0 ||
+            enemy.x - enemy.radius > WIDTH ||
+            enemy.y + enemy.radius < 0 ||
+            enemy.y - enemy.radius > HEIGHT) {
+            setTimeout(() => {
+                enemies.splice(index, 1)
+            }, 0)
+        }
     })
     particles.forEach((particle, index) => {
         particle.update()
@@ -473,6 +482,7 @@ addEventListener("mousemove", (event) => {
 })
 
 addEventListener("click", () => {
+    console.log(enemies)
     projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle}))
     if(player.reverseShot > 0) {projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle+Math.PI}))}
     shoot()
