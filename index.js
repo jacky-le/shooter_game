@@ -26,6 +26,7 @@ class Player {
 
         this.buffNum = 0
         this.canDash = 0
+        this.explode = 0
         this.speedShot = 1
     }
 
@@ -111,7 +112,7 @@ class Enemy {
                 power()
             }
             else if(this.color == 'rgb(150,150,150)') {
-                player.speedShot += 1
+                if(player.speedShot<10) {player.speedShot += 1}
                 power()
             }
             for(let i=0; i<10; i++) {
@@ -231,6 +232,7 @@ function debuff() {
     setInterval(() => {
         if(player.buffNum > 0) {player.buffNum--}
         if(player.canDash > 0) {player.canDash--}
+        if(player.explode > 0) {player.explode--}
     }, 1000);
 }
 
@@ -321,6 +323,15 @@ function animate() {
 
     if(keys.d.pressed) {
         player.x += SPEED
+    }
+
+    if(keys.f.pressed) {
+        if(player.explode == 0) {
+            player.explode = 3
+            for(let i=0; i<=Math.PI*2; i += Math.PI/18) {
+                projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color: (player.buffNum > 0) ? `hsl(${Math.random() * 360}, 50%, 50%)` : 'white', angle:i}))
+            }
+        }
     }
 
     if(keys.space.pressed) {
@@ -421,7 +432,8 @@ const keys = {
     a: {pressed: false},
     s: {pressed: false},
     d: {pressed: false},
-    space: {pressed: false}
+    space: {pressed: false},
+    f: {pressed: false}
 }
 addEventListener("mousemove", (event) => {
     if(player.buffNum > 0) {color = `hsl(${Math.random() * 360}, 50%, 50%)`}
@@ -466,6 +478,8 @@ addEventListener("mouseup", () => {
     clearInterval(shooting)
 })
 
+
+
 addEventListener("keydown", (event) => {
     switch(event.key) {
         
@@ -484,6 +498,9 @@ addEventListener("keydown", (event) => {
         case ' ':
             if(player.canDash == 0) {dash()}
             keys.space.pressed = true
+            break
+        case 'f':
+            keys.f.pressed = true
             break
     }
 })
@@ -505,6 +522,9 @@ addEventListener('keyup', (event) => {
             break
         case ' ':
             keys.space.pressed = false
+            break
+        case 'f':
+            keys.f.pressed = false
             break
     }
 })
