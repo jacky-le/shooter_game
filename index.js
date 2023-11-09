@@ -207,7 +207,7 @@ function spawnEnemies() {
         const angle = Math.atan2(HEIGHT/2 - randY, WIDTH/2 - randX)
         const speed = {x: Math.cos(angle), y: Math.sin(angle)}
         enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:color, speed:speed}))
-    }, (2000 - score/100))
+    }, (2000 - score/10))
 }
 
 let animationID
@@ -292,7 +292,7 @@ function animate() {
 function shoot() {
     const blaster = new Audio()
     blaster.src = "./blaster.mp3"
-    blaster.volume = 0.09
+    blaster.volume = 0.05
     blaster.play()
 }
 
@@ -300,29 +300,30 @@ function death() {
     const die = new Audio()
     const hurt = new Audio()
     die.src = "./scream.mp3"
-    die.volume = 0.3
+    die.volume = 0.1
     hurt.src = "./ouch.mp3"
-    hurt.volume = 0.3
+    hurt.volume = 0.05
     Math.random() < 0.5 ? die.play() : hurt.play()
 }
 
 function lose() {
     const lose = new Audio()
     lose.src = "./lose.mp3"
-    lose.volume = 0.4
+    lose.volume = 0.05
     lose.play()
 }
 
 function slap() {
     const slap = new Audio()
     slap.src = "./slap.mp3"
-    slap.volume = 0.4
+    slap.volume = 0.05
     slap.play()
 }
 
 function power() {
     const power = new Audio()
     power.src = "./power.mp3"
+    power.volume = 0.1
     power.play()
 }
 
