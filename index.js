@@ -292,7 +292,7 @@ function animate() {
 function shoot() {
     const blaster = new Audio()
     blaster.src = "./blaster.mp3"
-    blaster.volume = 0.001
+    blaster.volume = 0.0035
     blaster.play()
 }
 
