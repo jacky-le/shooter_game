@@ -355,6 +355,13 @@ function shoot() {
     blaster.play()
 }
 
+function dash() {
+    const dash = new Audio()
+    dash.src = "./dash.wav"
+    dash.volume = 0.1
+    dash.play()
+}
+
 function death() {
     const die = new Audio()
     const hurt = new Audio()
@@ -454,6 +461,7 @@ addEventListener("keydown", (event) => {
             keys.d.pressed = true
             break
         case ' ':
+            if(player.canDash == 0) {dash()}
             keys.space.pressed = true
             break
     }
