@@ -13,6 +13,8 @@ const btnSpan = document.querySelector('#btnSpan')
 const startSpan = document.querySelector('#startSpan')
 const pointSpan = document.querySelector('#pointSpan')
 
+let timer = 0
+
 class Player {
     constructor({x, y, radius, color}) {
         this.x = x
@@ -20,7 +22,7 @@ class Player {
         this.radius = radius
         this.color = color
 
-        this.buff = false
+        this.buffNum = 0
     }
 
     draw() {
@@ -100,18 +102,8 @@ class Enemy {
         this.draw()
         if(this.radius <= 10) {
             if(this.color == 'rgb(50,50,50)') {
-                let intervalId
-                clearInterval(intervalId)
-                player.buff = true
-                buffNum = 15
+                player.buffNum = 15
                 power()
-                intervalId = setInterval(() => {
-                    buffNum -= 1
-                    if(buffNum <= 0) {
-                        buffNum = 0
-                        clearInterval(intervalId)
-                    }
-                }, 2000);
             }
             for(let i=0; i<10; i++) {
                 const speed = {
@@ -186,40 +178,79 @@ function init() {
     particles = []
     score = 0
     scoreSpan.innerHTML = score
-    buffNum = 0
-    buffSpan.innerHTML = buffNum
+    buffSpan.innerHTML = player.buffNum
 }
 
+let count = 0
 function spawnEnemies() {
-    setInterval(() => {
-        const randR = Math.floor(Math.random() * 15 + 15)
-        const color = `hsl(${Math.random() * 360}, 50%, 50%)`
-        let randX
-        let randY
-        if(Math.random() < 0.5) {
-            randX = Math.random() < 0.5 ? 0 - randR : WIDTH + randR
-            randY = Math.random() * HEIGHT
-        }
-        else {
-            randX = Math.random() * WIDTH
-            randY = Math.random() < 0.5 ? 0 - randR : HEIGHT + randR
-        }
-        const angle = Math.atan2(player.y - randY, player.x - randX)
-        const speed = {x: Math.cos(angle), y: Math.sin(angle)}
-        enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:color, speed:speed}))
-    }, (900))
+    count++
+    let randR = Math.floor(Math.random() * 15 + 15)
+    let color = `hsl(${Math.random() * 360}, 50%, 50%)`
+    let randX
+    let randY
+    if(Math.random() < 0.5) {
+        randX = Math.random() < 0.5 ? 0 - randR : WIDTH + randR
+        randY = Math.random() * HEIGHT
+    }
+    else {
+        randX = Math.random() * WIDTH
+        randY = Math.random() < 0.5 ? 0 - randR : HEIGHT + randR
+    }
+    const angle = Math.atan2(player.y - randY, player.x - randX)
+    const speed = {x: Math.cos(angle), y: Math.sin(angle)}
+    if(count % 10 == 0) {
+        randR = Math.floor(Math.random() * 50 + 50)
+        color = 'rgb(50,50,50)'
+    }
+    enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:color, speed:speed}))
+    let spawnInterval = 1000
+    if(spawnInterval > 400) {spawnInterval -= timer*10}
+    setTimeout(() => {
+        spawnEnemies()
+    }, spawnInterval);
+    
+    // setInterval(() => {
+    //     let randR = Math.floor(Math.random() * 15 + 15)
+    //     let color = `hsl(${Math.random() * 360}, 50%, 50%)`
+    //     let randX
+    //     let randY
+    //     if(Math.random() < 0.5) {
+    //         randX = Math.random() < 0.5 ? 0 - randR : WIDTH + randR
+    //         randY = Math.random() * HEIGHT
+    //     }
+    //     else {
+    //         randX = Math.random() * WIDTH
+    //         randY = Math.random() < 0.5 ? 0 - randR : HEIGHT + randR
+    //     }
+    //     const angle = Math.atan2(player.y - randY, player.x - randX)
+    //     const speed = {x: Math.cos(angle), y: Math.sin(angle)}
+    //     if(count % 10 == 0) {
+    //         randR = Math.floor(Math.random() * 50 + 50)
+    //         color = 'rgb(50,50,50)'
+    //     }
+    //     enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:color, speed:speed}))
+    // }, (900))
 }
+
+function debuff() {
+    setInterval(() => {
+        if(player.buffNum > 0) {player.buffNum--}
+    }, 1000);
+}
+
+setInterval(() => {
+    timer += 1
+}, 1000);
 
 let animationID
 let score = 0
-let buffNum = 0
 function animate() {
     animationID = requestAnimationFrame(animate)
     c.fillStyle = 'rgba(0, 0, 0, 0.1)'
     c.fillRect(0, 0, WIDTH, HEIGHT)
     player.draw()
-    buffSpan.innerHTML = buffNum
-    if(!buffNum) {
+    buffSpan.innerHTML = player.buffNum
+    if(player.buffNum <= 0) {
         player.buff = false
         color = 'white'
     }
@@ -327,7 +358,6 @@ function power() {
     power.play()
 }
 
-
 let angle
 let color = 'white'
 const keys = {
@@ -337,14 +367,14 @@ const keys = {
     d: {pressed: false}
 }
 addEventListener("mousemove", (event) => {
-    if(player.buff) {color = `hsl(${Math.random() * 360}, 50%, 50%)`}
+    if(player.buffNum > 0) {color = `hsl(${Math.random() * 360}, 50%, 50%)`}
     angle = Math.atan2(event.clientY - player.y, event.clientX - player.x)
 })
 
 addEventListener("click", () => {
     projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle}))
     shoot()
-    if(player.buff) {
+    if(player.buffNum > 0) {
         setTimeout(() => {
             projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle += Math.PI/36}))
             shoot()
@@ -361,7 +391,7 @@ addEventListener("mousedown", () => {
     shooting = setInterval(() => {
         projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle}))
         shoot() 
-        if(player.buff) {
+        if(player.buffNum > 0) {
             setTimeout(() => {
                 projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle += Math.PI/36}))
                 shoot()
@@ -437,5 +467,6 @@ btnSpan.addEventListener('click', ()=> {
     init()
     animate()
     spawnEnemies()
+    debuff()
     startSpan.style.display = 'none'
 })
