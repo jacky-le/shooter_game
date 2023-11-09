@@ -14,6 +14,7 @@ const startSpan = document.querySelector('#startSpan')
 const pointSpan = document.querySelector('#pointSpan')
 
 let timer = 0
+let count = 0
 
 class Player {
     constructor({x, y, radius, color}) {
@@ -23,15 +24,18 @@ class Player {
         this.color = color
 
         this.buffNum = 0
+        this.canDash = 0
+        this.speedShot = 1
     }
 
     draw() {
         c.save()
-        c.shadowBlur = 5
-        c.shadowColor = 'gray'
+        c.shadowBlur = 10
+        c.shadowColor = (this.canDash > 0) ? 'gray' : 'green'
         c.beginPath()
         c.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
         c.fillStyle = this.color
+        //c.fillStyle = (this.canDash > 0) ? this.color : 'green'
         c.fill()
         c.restore()
     }
@@ -46,8 +50,8 @@ class Projectile {
         this.color = color
         this.angle = angle
         this.speed = {
-            x: Math.cos(angle) * 5,
-            y: Math.sin(angle) * 5
+            x: Math.cos(angle) * 5 * player.speedShot,
+            y: Math.sin(angle) * 5 * player.speedShot
         }
         this.amplitude = .5
         this.frequency = 0.25
@@ -103,6 +107,10 @@ class Enemy {
         if(this.radius <= 10) {
             if(this.color == 'rgb(50,50,50)') {
                 player.buffNum = 15
+                power()
+            }
+            else if(this.color == 'rgb(150,150,150)') {
+                player.speedShot += 1
                 power()
             }
             for(let i=0; i<10; i++) {
@@ -177,11 +185,13 @@ function init() {
     enemies = []
     particles = []
     score = 0
+    timer = 0
+    count = 0
     scoreSpan.innerHTML = score
     buffSpan.innerHTML = player.buffNum
 }
 
-let count = 0
+
 function spawnEnemies() {
     count++
     let randR = Math.floor(Math.random() * 15 + 15)
@@ -202,45 +212,31 @@ function spawnEnemies() {
         randR = Math.floor(Math.random() * 50 + 50)
         color = 'rgb(50,50,50)'
     }
+    if(count % 20 == 0) {
+        randR = Math.floor(Math.random() * 75 + 50)
+        color = 'rgb(150,150,150)'
+    }
     enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:color, speed:speed}))
     let spawnInterval = 1000
     if(spawnInterval > 400) {spawnInterval -= timer*10}
     setTimeout(() => {
         spawnEnemies()
     }, spawnInterval);
-    
-    // setInterval(() => {
-    //     let randR = Math.floor(Math.random() * 15 + 15)
-    //     let color = `hsl(${Math.random() * 360}, 50%, 50%)`
-    //     let randX
-    //     let randY
-    //     if(Math.random() < 0.5) {
-    //         randX = Math.random() < 0.5 ? 0 - randR : WIDTH + randR
-    //         randY = Math.random() * HEIGHT
-    //     }
-    //     else {
-    //         randX = Math.random() * WIDTH
-    //         randY = Math.random() < 0.5 ? 0 - randR : HEIGHT + randR
-    //     }
-    //     const angle = Math.atan2(player.y - randY, player.x - randX)
-    //     const speed = {x: Math.cos(angle), y: Math.sin(angle)}
-    //     if(count % 10 == 0) {
-    //         randR = Math.floor(Math.random() * 50 + 50)
-    //         color = 'rgb(50,50,50)'
-    //     }
-    //     enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:color, speed:speed}))
-    // }, (900))
 }
 
 function debuff() {
     setInterval(() => {
         if(player.buffNum > 0) {player.buffNum--}
+        if(player.canDash > 0) {player.canDash--}
     }, 1000);
 }
 
-setInterval(() => {
-    timer += 1
-}, 1000);
+function clock() {
+    setInterval(() => {
+        timer += 1
+    }, 1000);
+}
+
 
 let animationID
 let score = 0
@@ -317,13 +313,45 @@ function animate() {
     if(keys.d.pressed) {
         player.x += SPEED
     }
+
+    if(keys.space.pressed) {
+        const dashNum = 10
+        let x = 0, y = 0
+        if(keys.w.pressed) {
+            y -= dashNum
+        }
+    
+        if(keys.a.pressed) {
+            x -= dashNum
+        }
+    
+        if(keys.s.pressed) {
+            y += dashNum
+        }
+    
+        if(keys.d.pressed) {
+            x += dashNum
+        }
+        if(x != 0 && y != 0) {
+            x *= 0.7
+            y *= 0.7
+        }
+        
+        if(player.canDash == 0 && (x != 0 || y != 0)) {
+            gsap.to(player, {x: player.x += x, y: player.y +=y, duration:0.01 }) 
+            setTimeout(() => {
+                
+                player.canDash = 3
+            }, 100);
+        }
+    }
 }
 
 // Shoot on click
 function shoot() {
     const blaster = new Audio()
-    blaster.src = "./blaster.mp3"
-    blaster.volume = 0.0035
+    blaster.src = "./blaster.wav"
+    blaster.volume = 0.02
     blaster.play()
 }
 
@@ -339,8 +367,8 @@ function death() {
 
 function lose() {
     const lose = new Audio()
-    lose.src = "./lose.mp3"
-    lose.volume = 0.01
+    lose.src = "./test.ogg"
+    lose.volume = 0.05
     lose.play()
 }
 
@@ -353,8 +381,8 @@ function slap() {
 
 function power() {
     const power = new Audio()
-    power.src = "./power.mp3"
-    power.volume = 0.01
+    power.src = "./ohyeah.ogg"
+    power.volume = 0.2
     power.play()
 }
 
@@ -364,7 +392,8 @@ const keys = {
     w: {pressed: false},
     a: {pressed: false},
     s: {pressed: false},
-    d: {pressed: false}
+    d: {pressed: false},
+    space: {pressed: false}
 }
 addEventListener("mousemove", (event) => {
     if(player.buffNum > 0) {color = `hsl(${Math.random() * 360}, 50%, 50%)`}
@@ -377,12 +406,12 @@ addEventListener("click", () => {
     if(player.buffNum > 0) {
         setTimeout(() => {
             projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle += Math.PI/36}))
-            shoot()
+            //shoot()
         }, 75);
 
         setTimeout(() => {
             projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle -= Math.PI/36}))
-            shoot()
+            //shoot()
         }, 150);
     }
 })
@@ -394,12 +423,12 @@ addEventListener("mousedown", () => {
         if(player.buffNum > 0) {
             setTimeout(() => {
                 projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle += Math.PI/36}))
-                shoot()
+                //shoot()
             }, 75);
     
             setTimeout(() => {
                 projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle -= Math.PI/36}))
-                shoot()
+                //shoot()
             }, 150);
         }
     }, 100);
@@ -410,24 +439,8 @@ addEventListener("mouseup", () => {
 })
 
 addEventListener("keydown", (event) => {
-    if(event.key == " ") {
-        const randR = Math.floor(Math.random() * 50 + 50)
-        let randX
-        let randY
-        if(Math.random() < 0.5) {
-            randX = Math.random() < 0.5 ? 0 - randR : WIDTH + randR
-            randY = Math.random() * HEIGHT
-        }
-        else {
-            randX = Math.random() * WIDTH
-            randY = Math.random() < 0.5 ? 0 - randR : HEIGHT + randR
-        }
-        const angle = Math.atan2(player.y - randY, player.x - randX)
-        const speed = {x: Math.cos(angle), y: Math.sin(angle)}
-        enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:'rgb(50,50,50)', speed:speed}))
-    }
-    
     switch(event.key) {
+        
         case 'w':
             keys.w.pressed = true
             break
@@ -439,6 +452,9 @@ addEventListener("keydown", (event) => {
             break
         case 'd':
             keys.d.pressed = true
+            break
+        case ' ':
+            keys.space.pressed = true
             break
     }
 })
@@ -458,6 +474,9 @@ addEventListener('keyup', (event) => {
         case 'd':
             keys.d.pressed = false
             break
+        case ' ':
+            keys.space.pressed = false
+            break
     }
 })
 
@@ -468,5 +487,6 @@ btnSpan.addEventListener('click', ()=> {
     animate()
     spawnEnemies()
     debuff()
+    clock()
     startSpan.style.display = 'none'
 })
