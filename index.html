@@ -1,0 +1,20 @@
+<!--Sets body margin to 0 (cause 8px by default)-->
+<style>body {margin: 0; background: black}</style> 
+
+<!--Puts score html over canvas-->
+<div class="fixed text-white text-sm ml-2 mt-1 select-none"><span>Score: <span id="scoreSpan">0</span></span></div>
+<div class="fixed text-white text-sm ml-2 mt-6 select-none"><span>Buff: </span><span id="buffSpan">0</span></div>
+<div class="fixed inset-0 flex items-center justify-center" id="startSpan">
+    <div class="bg-white max-w-md w-full p-6 text-center">
+        <h1 class="text-4xl font-bold leading-none" id="pointSpan">0</h1>
+        <p class="text-sm text-gray-700 mt-1 mb-2">Points</p>
+        <div>
+            <button class="bg-blue-500 py-3 text-white text-sm w-full rounded-full" id="btnSpan">Start Game</button>
+        </div>
+    </div>
+</div>
+<canvas></canvas>
+<!--Pulls in javascript-->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" integrity="sha512-16esztaSRplJROstbIIdwX3N97V1+pZvV33ABoG1H2OyTttBxEGkTsoIVsiP1iaTtM8b3+hu2kB6pQ4Clr5yug==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="./index.js"></script>
