@@ -309,7 +309,7 @@ function animate() {
                         y: (Math.random() - 0.5) * (Math.random()*3)}
                     particles.push(new Particle(projectile.x, projectile.y, Math.random() + 1, enemy.color,speed))
                 }
-                slap()
+                //slap()
                 setTimeout(() => {
                     enemy.shrink()
                     projectiles.splice(projIndex, 1)
@@ -441,7 +441,7 @@ function power() {
 function evil() {
     const evil = new Audio()
     evil.src = "./evil.mp3"
-    evil.volume = 0.2
+    evil.volume = 0.1
     evil.play()
 }
 
