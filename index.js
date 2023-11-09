@@ -331,6 +331,13 @@ function animate() {
             for(let i=0; i<=Math.PI*2; i += Math.PI/18) {
                 projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color: (player.buffNum > 0) ? `hsl(${Math.random() * 360}, 50%, 50%)` : 'white', angle:i}))
             }
+            if(player.buffNum > 0) {
+                setTimeout(() => {
+                    for(let i=0; i<=Math.PI*2; i += Math.PI/18) {
+                        projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color: (player.buffNum > 0) ? `hsl(${Math.random() * 360}, 50%, 50%)` : 'white', angle:i}))
+                    }
+                }, 175);
+            }
         }
     }
 
