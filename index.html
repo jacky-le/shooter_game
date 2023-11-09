@@ -1,8 +1,13 @@
 <!--Sets body margin to 0 (cause 8px by default)-->
-<style>body {margin: 0; background: black}</style> 
+<style>
+    body {
+        margin: 0; 
+        background-image: url("./space3.png")
+    }
+</style> 
 
 <!--Puts score html over canvas-->
-<div class="fixed text-white text-sm ml-2 mt-1 select-none"><span>move - WASD | dash - SPACE | bomb - F</span></div>
+<div class="fixed text-white text-sm ml-2 mt-1 select-none"><span>move - WASD | shoot - LMB | dash - SPACE | bomb - F</span></div>
 <div class="fixed text-white text-sm ml-2 mt-6 select-none"><span>Score: <span id="scoreSpan">0</span></span></div>
 <div class="fixed text-white text-sm ml-2 mt-11 select-none"><span>Timer: </span><span id="timerSpan">0</span></div>
 <div class="fixed text-white text-sm ml-2 mt-16 select-none"><span>Buff: </span><span id="buffSpan">0</span></div>
