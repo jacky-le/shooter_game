@@ -221,15 +221,17 @@ function spawnEnemies() {
     }
     enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:color, speed:speed}))
     let spawnInterval = 1000
-    const maxSpawnRate = 150
+    const maxSpawnRate = 100
     if(spawnInterval > maxSpawnRate) {(spawnInterval - timer*10 < maxSpawnRate) ? spawnInterval = maxSpawnRate : spawnInterval -= timer*10}
     enemySpawnId = setTimeout(() => {
         spawnEnemies()
     }, spawnInterval);
+    //console.log(spawnInterval)
 }
 
+let debuffId
 function debuff() {
-    setInterval(() => {
+    debuffId = setInterval(() => {
         if(player.buffNum > 0) {player.buffNum--}
         if(player.canDash > 0) {player.canDash--}
         if(player.explode > 0) {player.explode--}
@@ -277,6 +279,7 @@ function animate() {
             bgm.currentTime = 0
             clearInterval(clockId)
             clearInterval(enemySpawnId)
+            clearInterval(debuffId)
             lose()
             cancelAnimationFrame(animationID)
             pointSpan.innerHTML = score
