@@ -28,6 +28,8 @@ class Player {
         this.canDash = 0
         this.explode = 0
         this.speedShot = 1
+        this.iframe = 0
+        this.reverseShot = 0
     }
 
     draw() {
@@ -36,8 +38,8 @@ class Player {
         c.shadowColor = (this.canDash > 0) ? 'gray' : 'green'
         c.beginPath()
         c.arc(this.x, this.y, this.radius, 0, Math.PI*2, false)
-        c.fillStyle = this.color
-        //c.fillStyle = (this.canDash > 0) ? this.color : 'green'
+        //c.fillStyle = this.color
+        c.fillStyle = (this.explode > 0) ? this.color : 'lightgreen'
         c.fill()
         c.restore()
     }
@@ -111,8 +113,12 @@ class Enemy {
                 player.buffNum = 15
                 power()
             }
-            else if(this.color == 'rgb(150,150,150)') {
-                if(player.speedShot<10) {player.speedShot += 1}
+            else if(this.color == 'rgb(250,250,250)') {
+                if(player.speedShot<10) {player.speedShot += 0.2}
+                power()
+            }
+            else if(this.color == 'rgb(150,0,0)') {
+                player.reverseShot = 20
                 power()
             }
             for(let i=0; i<10; i++) {
@@ -217,7 +223,13 @@ function spawnEnemies() {
     }
     if(count % 20 == 0) {
         randR = Math.floor(Math.random() * 75 + 50)
-        color = 'rgb(150,150,150)'
+        color = 'rgb(250,250,250)'
+    }
+    if(count % 50 == 0) {
+        randR = Math.floor(Math.random() * 150 + 100)
+        color = 'rgb(150,0,0)'
+        speed.x *= 0.6, speed.y *= 0.6
+        evil()
     }
     enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:color, speed:speed}))
     let spawnInterval = 1000
@@ -235,6 +247,8 @@ function debuff() {
         if(player.buffNum > 0) {player.buffNum--}
         if(player.canDash > 0) {player.canDash--}
         if(player.explode > 0) {player.explode--}
+        if(player.iframe > 0) {player.iframe--}
+        if(player.reverseShot > 0) {player.reverseShot--}
     }, 1000);
 }
 
@@ -274,7 +288,7 @@ function animate() {
         enemy.update()
         // Enemy & player collision
         const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
-        if(dist - enemy.radius - player.radius < 1) {
+        if(dist - enemy.radius - player.radius < 1 && !player.iframe) {
             bgm.pause()
             bgm.currentTime = 0
             clearInterval(clockId)
@@ -289,7 +303,7 @@ function animate() {
         projectiles.forEach((projectile, projIndex) => {
             const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y)
             if(dist - enemy.radius - projectile.radius < 1) {
-                for(let i=0; i<enemy.radius; i++) {
+                for(let i=0; i<enemy.radius/4; i++) {
                     const speed = {
                         x: (Math.random() - 0.5) * (Math.random()*3), 
                         y: (Math.random() - 0.5) * (Math.random()*3)}
@@ -368,6 +382,7 @@ function animate() {
         }
         
         if(player.canDash == 0 && (x != 0 || y != 0)) {
+            player.iframe = 1
             gsap.to(player, {x: player.x += x, y: player.y +=y, duration:0.01 }) 
             setTimeout(() => {
                 
@@ -423,6 +438,13 @@ function power() {
     power.play()
 }
 
+function evil() {
+    const evil = new Audio()
+    evil.src = "./evil.mp3"
+    evil.volume = 0.2
+    evil.play()
+}
+
 let bgm
 function music() {
     bgm = new Audio()
@@ -452,15 +474,18 @@ addEventListener("mousemove", (event) => {
 
 addEventListener("click", () => {
     projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle}))
+    if(player.reverseShot > 0) {projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle+Math.PI}))}
     shoot()
     if(player.buffNum > 0) {
         setTimeout(() => {
             projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle += Math.PI/36}))
+            if(player.reverseShot > 0) {projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle+Math.PI}))}
             //shoot()
         }, 75);
 
         setTimeout(() => {
             projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle -= Math.PI/36}))
+            if(player.reverseShot > 0) {projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle+Math.PI}))}
             //shoot()
         }, 150);
     }
@@ -469,15 +494,18 @@ addEventListener("click", () => {
 addEventListener("mousedown", () => {
     shooting = setInterval(() => {
         projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle}))
+        if(player.reverseShot > 0) {projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle+Math.PI}))}
         shoot() 
         if(player.buffNum > 0) {
             setTimeout(() => {
-                projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle += Math.PI/36}))
+                projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle + Math.PI/36}))
+                if(player.reverseShot > 0) {projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle+Math.PI+ Math.PI/36}))}
                 //shoot()
             }, 75);
     
             setTimeout(() => {
-                projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle -= Math.PI/36}))
+                projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle - Math.PI/36}))
+                if(player.reverseShot > 0) {projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle-Math.PI- Math.PI/36}))}
                 //shoot()
             }, 150);
         }
