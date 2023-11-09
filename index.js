@@ -12,6 +12,7 @@ const buffSpan = document.querySelector('#buffSpan')
 const btnSpan = document.querySelector('#btnSpan')
 const startSpan = document.querySelector('#startSpan')
 const pointSpan = document.querySelector('#pointSpan')
+const timerSpan = document.querySelector('#timerSpan')
 
 let timer = 0
 let count = 0
@@ -189,9 +190,10 @@ function init() {
     count = 0
     scoreSpan.innerHTML = score
     buffSpan.innerHTML = player.buffNum
+    music()
 }
 
-
+let enemySpawnId
 function spawnEnemies() {
     count++
     let randR = Math.floor(Math.random() * 15 + 15)
@@ -218,10 +220,12 @@ function spawnEnemies() {
     }
     enemies.push(new Enemy({x:randX, y:randY, radius:randR, color:color, speed:speed}))
     let spawnInterval = 1000
-    if(spawnInterval > 400) {spawnInterval -= timer*10}
-    setTimeout(() => {
+    const maxSpawnRate = 150
+    if(spawnInterval > maxSpawnRate) {(spawnInterval - timer*10 < maxSpawnRate) ? spawnInterval = maxSpawnRate : spawnInterval -= timer*10}
+    enemySpawnId = setTimeout(() => {
         spawnEnemies()
     }, spawnInterval);
+    console.log(spawnInterval)
 }
 
 function debuff() {
@@ -231,8 +235,9 @@ function debuff() {
     }, 1000);
 }
 
+let clockId
 function clock() {
-    setInterval(() => {
+    clockId = setInterval(() => {
         timer += 1
     }, 1000);
 }
@@ -246,6 +251,7 @@ function animate() {
     c.fillRect(0, 0, WIDTH, HEIGHT)
     player.draw()
     buffSpan.innerHTML = player.buffNum
+    timerSpan.innerHTML = timer
     if(player.buffNum <= 0) {
         player.buff = false
         color = 'white'
@@ -266,6 +272,10 @@ function animate() {
         // Enemy & player collision
         const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
         if(dist - enemy.radius - player.radius < 1) {
+            bgm.pause()
+            bgm.currentTime = 0
+            clearInterval(clockId)
+            clearInterval(enemySpawnId)
             lose()
             cancelAnimationFrame(animationID)
             pointSpan.innerHTML = score
@@ -391,6 +401,18 @@ function power() {
     power.src = "./ohyeah.ogg"
     power.volume = 0.2
     power.play()
+}
+
+let bgm
+function music() {
+    bgm = new Audio()
+    bgm.src = "./bgm.mp3"
+    bgm.volume = 0.05
+    bgm.play()
+    bgm.addEventListener('ended', () => {
+        bgm.currentTime = 0
+        bgm.play()
+    })
 }
 
 let angle
