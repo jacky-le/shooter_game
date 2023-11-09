@@ -225,7 +225,6 @@ function spawnEnemies() {
     enemySpawnId = setTimeout(() => {
         spawnEnemies()
     }, spawnInterval);
-    console.log(spawnInterval)
 }
 
 function debuff() {
