@@ -292,7 +292,7 @@ function animate() {
 function shoot() {
     const blaster = new Audio()
     blaster.src = "./blaster.mp3"
-    blaster.volume = 0.05
+    blaster.volume = 0.01
     blaster.play()
 }
 
@@ -302,28 +302,28 @@ function death() {
     die.src = "./scream.mp3"
     die.volume = 0.1
     hurt.src = "./ouch.mp3"
-    hurt.volume = 0.05
+    hurt.volume = 0.01
     Math.random() < 0.5 ? die.play() : hurt.play()
 }
 
 function lose() {
     const lose = new Audio()
     lose.src = "./lose.mp3"
-    lose.volume = 0.05
+    lose.volume = 0.01
     lose.play()
 }
 
 function slap() {
     const slap = new Audio()
     slap.src = "./slap.mp3"
-    slap.volume = 0.05
+    slap.volume = 0.01
     slap.play()
 }
 
 function power() {
     const power = new Audio()
     power.src = "./power.mp3"
-    power.volume = 0.1
+    power.volume = 0.01
     power.play()
 }
 
