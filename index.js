@@ -300,7 +300,7 @@ function death() {
     const die = new Audio()
     const hurt = new Audio()
     die.src = "./scream.mp3"
-    die.volume = 0.1
+    die.volume = 0.01
     hurt.src = "./ouch.mp3"
     hurt.volume = 0.01
     Math.random() < 0.5 ? die.play() : hurt.play()
