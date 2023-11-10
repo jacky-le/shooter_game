@@ -353,12 +353,14 @@ function animate() {
 
     if(keys.f.pressed) {
         if(player.explode == 0) {
+            explode()
             player.explode = 3
             for(let i=0; i<=Math.PI*2; i += Math.PI/18) {
                 projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color: (player.buffNum > 0) ? `hsl(${Math.random() * 360}, 50%, 50%)` : 'white', angle:i}))
             }
             if(player.buffNum > 0) {
                 setTimeout(() => {
+                    explode()
                     for(let i=0; i<=Math.PI*2; i += Math.PI/18) {
                         projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color: (player.buffNum > 0) ? `hsl(${Math.random() * 360}, 50%, 50%)` : 'white', angle:i}))
                     }
@@ -454,6 +456,13 @@ function evil() {
     evil.play()
 }
 
+function explode() {
+    const explode = new Audio()
+    explode.src = "./explosion.wav"
+    explode.volume = 0.07
+    explode.play()
+}
+
 let bgm
 function music() {
     bgm = new Audio()
@@ -482,7 +491,7 @@ addEventListener("mousemove", (event) => {
 })
 
 addEventListener("click", () => {
-    console.log(enemies)
+    //console.log(enemies)
     projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle}))
     if(player.reverseShot > 0) {projectiles.push(new Projectile({x:player.x,y:player.y,radius:5,color:color, angle:angle+Math.PI}))}
     shoot()
@@ -576,7 +585,6 @@ addEventListener('keyup', (event) => {
             break
     }
 })
-
 
 
 btnSpan.addEventListener('click', ()=> {
